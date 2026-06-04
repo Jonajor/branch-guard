@@ -8,6 +8,8 @@ import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 
@@ -31,7 +33,12 @@ class ProtectedBranchEditListener(
             val dialog = CreateBranchDialog(project, context.currentBranch, settings)
             if (!dialog.showAndGet()) return@invokeLater
             if (dialog.continuedAnyway()) return@invokeLater
-            gitBranchService.createAndCheckout(context.repository, dialog.branchName())
+            val branchName = dialog.branchName()
+            object : Task.Backgroundable(project, "Creating branch $branchName", false) {
+                override fun run(indicator: ProgressIndicator) {
+                    gitBranchService.createAndCheckout(context.repository, branchName)
+                }
+            }.queue()
         }
     }
 
