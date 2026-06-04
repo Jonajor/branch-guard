@@ -1,45 +1,73 @@
-# branch-guard
+# Branch Guard
 
-![Build](https://github.com/Jonajor/branch-guard/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
+Branch Guard is a JetBrains IDE plugin that prevents accidental development on protected Git branches.
 
-## Template ToDo list
-- [x] Create a new [IntelliJ Platform Plugin Template][template] project.
-- [ ] Get familiar with the [template documentation][template].
-- [ ] Adjust the [group](./gradle.properties), as well as the [id](./src/main/resources/META-INF/plugin.xml), [name](./src/main/resources/META-INF/plugin.xml), and [sources package](./src/main/kotlin).
-- [ ] Adjust the plugin [description](./src/main/resources/META-INF/plugin.xml) (see [Tips][docs:plugin-description]) and this README to describe what your plugin does.
-- [ ] Review the [Legal Agreements](https://plugins.jetbrains.com/docs/marketplace/legal-agreements.html?from=IJPluginTemplate).
-- [ ] [Publish a plugin manually](https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html?from=IJPluginTemplate) for the first time.
-- [ ] Set the `MARKETPLACE_ID` in the above README badges. You can obtain it once the plugin is published to JetBrains Marketplace.
-- [ ] Set the [Plugin Signing](https://plugins.jetbrains.com/docs/intellij/plugin-signing.html?from=IJPluginTemplate) related [secrets](https://github.com/JetBrains/intellij-platform-plugin-template#environment-variables).
-- [ ] Set the [Deployment Token](https://plugins.jetbrains.com/docs/marketplace/plugin-upload.html?from=IJPluginTemplate).
-- [ ] Click the <kbd>Watch</kbd> button on the top of the [IntelliJ Platform Plugin Template][template] to be notified about releases containing new features and fixes.
+When you start editing code on branches such as `main`, `master`, or `develop`, Branch Guard offers to create and check out a ticket-based feature branch before you continue.
 
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
+## Features
 
-## Installation
+- Protected branch detection for Git projects
+- First-edit warning on configured protected branches
+- Ticket-based feature branch creation
+- Custom branch prefixes and templates
+- Lightweight Settings UI under `Settings > Tools > Branch Guard`
+- Notifications for branch creation, existing branches, and Git failures
 
-- Using the IDE built-in plugin system:
+## Default Configuration
 
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "branch-guard"</kbd> >
-  <kbd>Install</kbd>
+Protected branches:
 
-- Using JetBrains Marketplace:
+- `main`
+- `master`
+- `develop`
 
-  Go to [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID) and install it by clicking the <kbd>Install to ...</kbd> button in case your IDE is running.
+Branch naming:
 
-  You can also download the [latest release](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID/versions) from JetBrains Marketplace and install it manually using
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
+```text
+{prefix}/{ticket}-{description}
+```
 
-- Manually:
+Default prefix:
 
-  Download the [latest release](https://github.com/Jonajor/branch-guard/releases/latest) and install it manually using
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
+```text
+feature
+```
 
+Default ticket regex:
 
----
-Plugin based on the [IntelliJ Platform Plugin Template][template].
+```text
+[A-Z]+-\d+
+```
 
-[template]: https://github.com/JetBrains/intellij-platform-plugin-template
-[docs:plugin-description]: https://plugins.jetbrains.com/docs/intellij/plugin-user-experience.html#plugin-description-and-presentation
+Example:
+
+```text
+ABC-123 + Fix Login Error
+=> feature/ABC-123-fix-login-error
+```
+
+## Development
+
+Run tests:
+
+```bash
+./gradlew test
+```
+
+Run the plugin in a sandbox IDE:
+
+```bash
+./gradlew runIde
+```
+
+Build the plugin:
+
+```bash
+./gradlew buildPlugin
+```
+
+## Marketplace Description
+
+Prevent accidental development on protected branches.
+
+Branch Guard detects when you start editing code on branches like `main`, `master`, or `develop` and offers to create a ticket-based feature branch before you continue.

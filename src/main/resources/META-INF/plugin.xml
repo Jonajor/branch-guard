@@ -1,19 +1,35 @@
-<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.github.jonajor.branchguard</id>
-    <name>branch-guard</name>
+    <name>Branch Guard</name>
     <vendor>jonajor</vendor>
     <description><![CDATA[
-        <p><b>branch-guard</b> is a repository that provides a pure template to make it easier to create a new plugin project.</p>
-        <p>The main goal of this template is to speed up the setup phase of plugin development for both new and experienced developers by preconfiguring the project scaffold and CI, linking to the proper documentation pages, and keeping everything organized.</p>
+        <p>Prevent accidental development on protected branches.</p>
+        <p>Branch Guard detects when you start editing code on branches like main, master, or develop and offers to create a ticket-based feature branch before you continue.</p>
+        <p><b>Features:</b></p>
+        <ul>
+            <li>Protected branch detection</li>
+            <li>Ticket-based branch creation</li>
+            <li>Custom branch naming templates</li>
+            <li>Git integration</li>
+            <li>Lightweight workflow protection</li>
+        </ul>
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>Git4Idea</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
+    <resource-bundle>messages.BranchGuardBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.jonajor.branchguard.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="com.github.jonajor.branchguard.startup.MyProjectActivity" />
+        <applicationService serviceImplementation="com.github.jonajor.branchguard.settings.BranchGuardSettings"/>
+        <applicationConfigurable
+            parentId="tools"
+            instance="com.github.jonajor.branchguard.settings.BranchGuardConfigurable"
+            id="com.github.jonajor.branchguard.settings"
+            displayName="Branch Guard"/>
+        <notificationGroup
+            id="Branch Guard"
+            displayType="BALLOON"/>
+        <postStartupActivity implementation="com.github.jonajor.branchguard.settings.BranchGuardStartupActivity"/>
     </extensions>
 </idea-plugin>
