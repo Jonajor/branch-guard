@@ -25,18 +25,28 @@ class ProtectedBranchEditListener(
 
         val context = gitBranchService.branchContextFor(file) ?: return
         if (context.currentBranch !in settings.protectedBranchSet()) return
-        if (sessionState.isSuppressed(context.repository, context.currentBranch)) return
+        if (!sessionState.markPromptActive(context.repository, context.currentBranch)) return
 
-        sessionState.suppress(context.repository, context.currentBranch)
         ApplicationManager.getApplication().invokeLater {
-            if (project.isDisposed) return@invokeLater
+            if (project.isDisposed) {
+                sessionState.clearPromptActive(context.repository, context.currentBranch)
+                return@invokeLater
+            }
+
             val dialog = CreateBranchDialog(project, context.currentBranch, settings)
-            if (!dialog.showAndGet()) return@invokeLater
-            if (dialog.continuedAnyway()) return@invokeLater
+            if (!dialog.showAndGet() || dialog.continuedAnyway()) {
+                sessionState.clearPromptActive(context.repository, context.currentBranch)
+                return@invokeLater
+            }
+
             val branchName = dialog.branchName()
             object : Task.Backgroundable(project, "Creating branch $branchName", false) {
                 override fun run(indicator: ProgressIndicator) {
-                    gitBranchService.createAndCheckout(context.repository, branchName)
+                    try {
+                        gitBranchService.createAndCheckout(context.repository, branchName)
+                    } finally {
+                        sessionState.clearPromptActive(context.repository, context.currentBranch)
+                    }
                 }
             }.queue()
         }

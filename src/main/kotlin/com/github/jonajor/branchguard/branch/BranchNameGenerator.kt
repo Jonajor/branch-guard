@@ -52,6 +52,7 @@ object BranchNameGenerator {
             .replace(repeatedSeparators, "/")
             .trim('/', '.', '-')
 
+
         while (branch.endsWith(".lock")) {
             branch = branch.removeSuffix(".lock").trim('.', '-', '/')
         }
