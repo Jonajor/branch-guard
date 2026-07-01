@@ -5,6 +5,10 @@ import java.util.concurrent.ConcurrentHashMap
 
 class BranchGuardSessionState {
     private val activePrompts = ConcurrentHashMap.newKeySet<String>()
+    private val dismissedPrompts = ConcurrentHashMap.newKeySet<String>()
+
+    fun isPromptDismissed(repository: GitRepository, branch: String): Boolean =
+        key(repository, branch) in dismissedPrompts
 
     fun markPromptActive(repository: GitRepository, branch: String): Boolean =
         activePrompts.add(key(repository, branch))
@@ -13,8 +17,13 @@ class BranchGuardSessionState {
         activePrompts.remove(key(repository, branch))
     }
 
+    fun dismissPrompt(repository: GitRepository, branch: String) {
+        dismissedPrompts.add(key(repository, branch))
+    }
+
     fun reset() {
         activePrompts.clear()
+        dismissedPrompts.clear()
     }
 
     private fun key(repository: GitRepository, branch: String): String =

@@ -25,6 +25,7 @@ class ProtectedBranchEditListener(
 
         val context = gitBranchService.branchContextFor(file) ?: return
         if (context.currentBranch !in settings.protectedBranchSet()) return
+        if (sessionState.isPromptDismissed(context.repository, context.currentBranch)) return
         if (!sessionState.markPromptActive(context.repository, context.currentBranch)) return
 
         ApplicationManager.getApplication().invokeLater {
@@ -35,6 +36,7 @@ class ProtectedBranchEditListener(
 
             val dialog = CreateBranchDialog(project, context.currentBranch, settings)
             if (!dialog.showAndGet() || dialog.continuedAnyway()) {
+                sessionState.dismissPrompt(context.repository, context.currentBranch)
                 sessionState.clearPromptActive(context.repository, context.currentBranch)
                 return@invokeLater
             }
