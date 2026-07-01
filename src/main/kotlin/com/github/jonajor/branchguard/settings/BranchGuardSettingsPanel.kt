@@ -15,7 +15,7 @@ class BranchGuardSettingsPanel {
     private val branchModel = DefaultListModel<String>()
     private val branchList = JBList(branchModel).apply {
         emptyText.text = "No protected branches configured"
-        selectionMode = ListSelectionModel.SINGLE_SELECTION
+        selectionMode = ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
         visibleRowCount = 5
     }
 
@@ -33,17 +33,19 @@ class BranchGuardSettingsPanel {
                         .setAddAction {
                             val value = com.intellij.openapi.ui.Messages.showInputDialog(
                                 this,
-                                "Branch name:",
-                                "Add Protected Branch",
+                                "Branch name(s), separated by comma, semicolon, or space:",
+                                "Add Protected Branches",
                                 null,
                             )?.trim()
-                            if (!value.isNullOrEmpty() && value !in branches()) {
-                                branchModel.addElement(value)
+
+                            parseBranches(value).forEach { branch ->
+                                if (branch !in branches()) {
+                                    branchModel.addElement(branch)
+                                }
                             }
                         }
                         .setRemoveAction {
-                            val index = branchList.selectedIndex
-                            if (index >= 0) {
+                            branchList.selectedIndices.sortedDescending().forEach { index ->
                                 branchModel.remove(index)
                             }
                         }
@@ -87,4 +89,12 @@ class BranchGuardSettingsPanel {
 
     private fun branches(): List<String> =
         (0 until branchModel.size()).map { branchModel.getElementAt(it) }
+
+    private fun parseBranches(value: String?): List<String> =
+        value
+            ?.split(Regex("""[,;\s]+"""))
+            ?.map { it.trim() }
+            ?.filter { it.isNotEmpty() }
+            ?.distinct()
+            .orEmpty()
 }

@@ -4,17 +4,17 @@ import git4idea.repo.GitRepository
 import java.util.concurrent.ConcurrentHashMap
 
 class BranchGuardSessionState {
-    private val suppressed = ConcurrentHashMap.newKeySet<String>()
+    private val activePrompts = ConcurrentHashMap.newKeySet<String>()
 
-    fun isSuppressed(repository: GitRepository, branch: String): Boolean =
-        key(repository, branch) in suppressed
+    fun markPromptActive(repository: GitRepository, branch: String): Boolean =
+        activePrompts.add(key(repository, branch))
 
-    fun suppress(repository: GitRepository, branch: String) {
-        suppressed.add(key(repository, branch))
+    fun clearPromptActive(repository: GitRepository, branch: String) {
+        activePrompts.remove(key(repository, branch))
     }
 
     fun reset() {
-        suppressed.clear()
+        activePrompts.clear()
     }
 
     private fun key(repository: GitRepository, branch: String): String =
